@@ -1,0 +1,6 @@
+#IGNORE THE FLASK SESSIONS FOLDER
+flask_session/
+
+# IGNORE PYTHON COMPILED FILES
+__pycache__/
+*.py[cod]
