@@ -5,32 +5,40 @@
 {% endblock %}
 
 {% block body %}
-<form>
+  {% if success_message %}
+  <div class="alert alert-success" role="alert">
+    <strong>Well done!</strong> You successfully registered <a href="{{ url_for('login') }}" class="alert-link">Click here to login!</a>.
+  </div>
+  {% else %}
+  <form action="{{ url_for('register') }}" method="post">
     <div class="form-group">
         <div class="form-row">
             <div class="col">
-                <input type="text" class="form-control" placeholder="First name">
+                <input type="text" class="form-control" name="firstname" placeholder="First name" required>
             </div>
             <div class="col">
-                <input type="text" class="form-control" placeholder="Last name">
+                <input type="text" class="form-control" name="lastname" placeholder="Last name" required>
             </div>
         </div>
     </div>
     <div class="form-group">
-      <input type="username" class="form-control" id="username" placeholder="Username">
+      <input type="username" class="form-control" name="username" placeholder="Username" required>
     </div>
     <div class="form-group">
-      <input type="password" class="form-control" id="password" placeholder="Password">
+      <input type="password" class="form-control" name="password" placeholder="Password" required>
     </div>
     <div class="form-group">
-        <input type="password" class="form-control" id="ConfirmPassword" placeholder="Confirm Password">
-      </div>
-    <div class="form-group">
-        <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Email">
+        <input type="email" class="form-control" name="email" aria-describedby="emailHelp" placeholder="Email" required>
       </div>
     <button type="submit" class="btn btn-primary">Register</button>
     <div>
-        <p>Already have an account? <a href="#">click here</a></p>
+        <p>Already have an account? <a href="{{ url_for('login') }}">click here</a></p>
     </div>
   </form>
+  {% if alert %}
+  <div class="alert alert-danger" role="alert">
+    <strong>Oh snap!</strong> That username is already taken!
+  </div>
+  {% endif %}
+  {% endif %}
 {% endblock %}

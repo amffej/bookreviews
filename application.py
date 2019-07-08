@@ -1,6 +1,6 @@
-import os, requests, json
+import os, json, hashlib
 import pprint as pp
-from flask import Flask, session, render_template
+from flask import Flask, session, render_template, request, redirect, url_for
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -24,19 +24,75 @@ db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/")
 def index():
-    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": KEY, "isbns": "0380795272"})
-    pp.pprint(res.json())
-    return "Project 1: TODO"
+    #res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": KEY, "isbns": "0380795272"})
+    #pp.pprint(res.json())
+    if 'username' in session:
+        firstname= session['firstname']
+        firstname = firstname.capitalize()
+        return 'Hello ' + firstname + '<br>' + \
+         "<b><a href = '/logout'>click here to log out</a></b>"
+    return "You are not logged in <br><a href = '/login'></b>" + \
+      "click here to log in</b></a>"
+    #return render_template("index.html")
 
-@app.route("/login/")
+@app.route("/register", methods=["POST", "GET"])
+def register():
+    if request.method == "POST":
+        # Get form information.
+        fname = request.form.get("firstname")
+        lname = request.form.get("lastname")
+        uname = request.form.get("username")
+        email = request.form.get("email")
+        password = request.form.get("password")
+
+        # Make password database safe
+        salt = "4xO9"
+        db_password = password+salt
+        password_hash = hashlib.md5(db_password.encode())
+        print(password_hash.hexdigest())
+
+        # Check that Username is not taken
+        if db.execute("SELECT * FROM users WHERE username = :username", {"username": uname}).rowcount > 0:
+            return render_template("register.html", alert=True) 
+        db.execute("INSERT INTO users (firstname, lastname, username, password, email) VALUES (:fname, :lname, :uname, :password, :email )",
+                {"fname": fname, "lname": lname, "uname" : uname, "password" : password_hash.hexdigest(), "email" : email})
+        db.commit()
+        return render_template("register.html", success_message=True)
+    return render_template("register.html")
+
+@app.route("/login", methods=["POST", "GET"])
 def login():
-    #flights = db.execute("SELECT * FROM flights").fetchall()
+    if request.method == "POST":
+        # Get form information.
+        uname = request.form.get("username")
+        password = request.form.get("password")
+
+        # Check if user is in database
+        if db.execute("SELECT * FROM users WHERE username = :username", {"username": uname}).rowcount == 0:
+            return render_template("login.html", alert=True)
+        
+        # Get user information from database
+        db_userinfo = db.execute("SELECT * FROM users where username = :username", {"username": uname}).fetchone()
+        
+        # Compare input password vs stored password
+        salt = "4xO9"
+        db_password = password+salt
+        password_hash = hashlib.md5(db_password.encode())
+        password_check = (db_userinfo.password == password_hash.hexdigest())
+
+        if password_check:
+            session['username'] = db_userinfo.username
+            session['firstname'] = db_userinfo.firstname
+            session['lastname'] = db_userinfo.lastname
+            return redirect(url_for('index'))
+        return render_template("login.html", alert=True) 
     return render_template("login.html")
 
-@app.route("/register/")
-def register():
-    #flights = db.execute("SELECT * FROM flights").fetchall()
-    return render_template("register.html")
+@app.route('/logout')
+def logout():
+   # remove the username from the session if it is there
+   session.pop('username', None)
+   return redirect(url_for('index'))
 
 @app.route("/book/")
 def book():
