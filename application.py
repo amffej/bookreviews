@@ -28,16 +28,17 @@ def index():
         firstname= session['firstname']
         firstname = firstname.capitalize()
         search_data = request.args.get("search")
-        search_data_formated = '%{0}%'.format(search_data)
-        search_data_capitalized = search_data.capitalize()
-        search_data_capitalized_formated = '%{0}%'.format(search_data_capitalized)
-        #search_data = search_data.strip('\'')
-        pp.pprint(f"Searching for: {search_data_capitalized_formated}")
-        search_results = db.execute("select * from books where title LIKE :search or title LIKE :search_cap or isbn LIKE :search or author LIKE :search or author LIKE :search_cap", {"search" : search_data_formated, "search_cap" : search_data_capitalized_formated}).fetchall()
-        #search_results = db.execute("select title from books where title LIKE :search or isbn LIKE :search or author LIKE :search", {"search" : search_data_formated})
-        #pp.pprint(search_results)
-        for book in search_results:
-            pp.pprint(book.title)
+        search_results = []
+        if search_data is not None:
+            search_data_formated = '%{0}%'.format(search_data)
+            search_data_capitalized = search_data.capitalize()
+            search_data_capitalized_formated = '%{0}%'.format(search_data_capitalized)
+            pp.pprint(f"Searching for: {search_data_capitalized_formated}")
+            search_results = db.execute("select * from books where title LIKE :search or title LIKE :search_cap or isbn LIKE :search or author LIKE :search or author LIKE :search_cap", {"search" : search_data_formated, "search_cap" : search_data_capitalized_formated}).fetchall()
+            #search_results = db.execute("select title from books where title LIKE :search or isbn LIKE :search or author LIKE :search", {"search" : search_data_formated})
+            #pp.pprint(search_results)
+            for book in search_results:
+                pp.pprint(book.title)
         return render_template("index.html", signed_in=True, firstname=firstname, results = search_results)
     return redirect(url_for('login'))
     

@@ -18,7 +18,7 @@
 <div class="row">
         {% for book in results %}
         <div class="col-sm mb-2">
-        <div class="card" style="width: 18rem;">
+        <div class="card" style="width: 10rem;">
                 <img class="card-img-top" src="http://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg" alt="{{book.title}}">
                 <div class="card-body">
                   <p class="card-text">Title: {{ book.title}} </br> Author: {{ book.author }} </br> Year: {{ book.year }} </br> ISBN: {{ book.isbn }}</br> ID: {{ book.id }}</p>
