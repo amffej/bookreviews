@@ -24,16 +24,23 @@ db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/", methods=["GET"])
 def index():
-    search_data = request.form.get("search")
-    pp.pprint(search_data)
-    #print(search_data)
-    # Check if user is signed in
     if 'username' in session:
         firstname= session['firstname']
         firstname = firstname.capitalize()
-        return render_template("index.html", signed_in=True, firstname=firstname)
+        search_data = request.args.get("search")
+        search_data_formated = '%{0}%'.format(search_data)
+        search_data_capitalized = search_data.capitalize()
+        search_data_capitalized_formated = '%{0}%'.format(search_data_capitalized)
+        #search_data = search_data.strip('\'')
+        pp.pprint(f"Searching for: {search_data_capitalized_formated}")
+        search_results = db.execute("select * from books where title LIKE :search or title LIKE :search_cap or isbn LIKE :search or author LIKE :search or author LIKE :search_cap", {"search" : search_data_formated, "search_cap" : search_data_capitalized_formated}).fetchall()
+        #search_results = db.execute("select title from books where title LIKE :search or isbn LIKE :search or author LIKE :search", {"search" : search_data_formated})
+        #pp.pprint(search_results)
+        for book in search_results:
+            pp.pprint(book.title)
+        return render_template("index.html", signed_in=True, firstname=firstname, results = search_results)
     return redirect(url_for('login'))
-
+    
 
 @app.route("/register", methods=["POST", "GET"])
 def register():
@@ -44,8 +51,7 @@ def register():
         uname = request.form.get("username")
         email = request.form.get("email")
         password = request.form.get("password")
-
-        # Make password database safe
+                # Make password database safe
         salt = "4xO9"
         db_password = password+salt
         password_hash = hashlib.md5(db_password.encode())
