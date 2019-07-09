@@ -22,18 +22,18 @@ engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def index():
-    #res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": KEY, "isbns": "0380795272"})
-    #pp.pprint(res.json())
+    search_data = request.form.get("search")
+    pp.pprint(search_data)
+    #print(search_data)
+    # Check if user is signed in
     if 'username' in session:
         firstname= session['firstname']
         firstname = firstname.capitalize()
-        return 'Hello ' + firstname + '<br>' + \
-         "<b><a href = '/logout'>click here to log out</a></b>"
-    return "You are not logged in <br><a href = '/login'></b>" + \
-      "click here to log in</b></a>"
-    #return render_template("index.html")
+        return render_template("index.html", signed_in=True, firstname=firstname)
+    return redirect(url_for('login'))
+
 
 @app.route("/register", methods=["POST", "GET"])
 def register():
@@ -94,8 +94,10 @@ def logout():
    session.pop('username', None)
    return redirect(url_for('index'))
 
-@app.route("/book/")
+@app.route("/book")
 def book():
+    #res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": KEY, "isbns": "0380795272"})
+    #pp.pprint(res.json())
     #flights = db.execute("SELECT * FROM flights").fetchall()
     return render_template("book.html")
 

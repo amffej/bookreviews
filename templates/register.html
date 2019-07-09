@@ -10,6 +10,7 @@
     <strong>Well done!</strong> You successfully registered <a href="{{ url_for('login') }}" class="alert-link">Click here to login!</a>.
   </div>
   {% else %}
+  <h3>Register</h3>
   <form action="{{ url_for('register') }}" method="post">
     <div class="form-group">
         <div class="form-row">
