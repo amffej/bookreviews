@@ -80,14 +80,16 @@ CREATE TABLE "public"."users" (
 ### Other Features:
 
 - Search for capitalized entries in database
-- Genera database safe password using md5 + salt
+- Generate database safe passwords using md5 + salt
 - Dynamic menu fields based on user sign in/out status
-- Bootstrap cards for Desktop and Mobile friendly viewing
+- Bootstrap cards for desktop and mobile friendly viewing
 
 ### Future improvements:
 
-- When search result is 4 or less items, the cards dont alight in most optimal manner.
-- Add more details on the review, including time stamp.
+- Search only capitalizes first word in query 
+- When search result is 4 or less items, the cards dont align in most optimal manner.
+- Add more details on each review item, including time stamp.
 - Add a 5 star CSS book review button.
+
 
 
