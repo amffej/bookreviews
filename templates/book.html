@@ -1,9 +1,84 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Book Page
+Book Page
 {% endblock %}
 
 {% block body %}
-    <h1>This is the Book Page</h1>
+{% for book in results %}
+<div class="container">
+    <!-- Search Bar -->
+    <div class="input-group mb-3 mt-4">
+        <form class="input-group" id="newsearch" method="get" action="{{ url_for('index') }}">
+            <input type="text" name="search" class="form-control" placeholder="Search for ISBN, Author or Title"
+                aria-label="Recipient's username" aria-describedby="basic-addon2">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+    <!-- Book Information -->
+    <div class="row justify-content-md-center mt-5">
+        <div class="col col-lg-3">
+            <div class="card bg-light mb-3" style="max-width: 18rem;">
+                <div class="card-header">
+                    <h5><b>{{ book.title}}</b></h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title"><b>by</b> {{ book.author }}</h6>
+                    <p class="card-text">
+                        <h6><small><b>Published:</b> {{ book.year }} </br> <b>ISBN:</b> {{ book.isbn }}
+                    </p></small></h6>
+                    </p>
+                    <div class="card-footer">
+                        <a href="https://www.goodreads.com"><img src="/static/gr-logo.png"
+                                alt="GoodReads Review"></a><br>
+                        Rating {{goodreads_rating}} / 5 ({{goodreads_count}} Total)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Book Image -->
+        <div class="col col-lg-2">
+            <img class="rounded mx-auto d-block" src="http://covers.openlibrary.org/b/isbn/{{ book.isbn }}-L.jpg"
+                alt="{{book.title}}">
+        </div>
+    </div>
+    <!-- Review Box -->
+    <div class="row justify-content-md-center mt-2">
+        <div class="col col-sm-12 col-md-8 col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <b>Hi {{ firstname }}!</b>, Wan't to review this book?
+                </div>
+                <div class="card-body">
+                    <form class="input-group" method="post" action="{{ url_for('review') }}">
+                        <textarea class="form-control mb-2 "
+                            placeholder="{% if user_reviewed %}It looks like you already reviewed this book! {% else %} Start your review here... {% endif %}"
+                            name="review_txt" rows="3" {% if user_reviewed %} readonly {% endif %}></textarea>
+                        <button class="btn btn-primary float-right" type="submit" {% if user_reviewed %} disabled
+                            {% endif %}>review!</button>
+                        <input type="hidden" id="book_id" name="book_id" value="{{ book.id}}">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Reviews -->
+    {% for review in reviews %}
+    <div class="row justify-content-md-center mt-2 mb-2">
+        <div class="col col-sm-12 col-md-8 col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <b>{{ review.username }}</b>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ review.review_text }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
 {% endblock %}

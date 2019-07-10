@@ -1,32 +1,45 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Book Reviews!
+Book Reviews!
 {% endblock %}
 
 {% block body %}
 {% if signed_in %}
-     
+<!-- Search Bar -->
 <div class="input-group mb-3 mt-4">
-    <form class="input-group" id="newsearch" method="get" action="{{ url_for('index') }}">
-    <input type="text" name="search" class="form-control" placeholder="Search for ISBN, Author or Title" aria-label="Recipient's username" aria-describedby="basic-addon2">
-        <div class="input-group-append">
-          <button  class="btn btn-outline-secondary" type="submit">Search</button>
-        </div>
-    </form>    
+  <form class="input-group" id="newsearch" method="get" action="{{ url_for('index') }}">
+    <input type="text" name="search" class="form-control" placeholder="Search for ISBN, Author or Title"
+      aria-label="Recipient's username" aria-describedby="basic-addon2">
+    <div class="input-group-append">
+      <button class="btn btn-outline-secondary" type="submit">Search</button>
+    </div>
+  </form>
 </div>
-<div class="row">
-        {% for book in results %}
-        <div class="col-sm mb-2">
-        <div class="card" style="width: 10rem;">
-                <img class="card-img-top" src="http://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg" alt="{{book.title}}">
-                <div class="card-body">
-                  <p class="card-text">Title: {{ book.title}} </br> Author: {{ book.author }} </br> Year: {{ book.year }} </br> ISBN: {{ book.isbn }}</br> ID: {{ book.id }}</p>
-                </div>
-              </div>
-            </div>
-        {% endfor %}
+<!-- Search Results -->
+{% if results %}
+<div class="card-columns">
+  {% for book in results %}
+  <div class="card" style="width: 10rem;">
+    <a href="{{ url_for('book') }}?id={{ book.id }}"><img class="card-img-top"
+        src="http://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg" alt="{{book.title}}"></a>
+    <div class="card-body">
+      <h6><small>
+          <p class="card-text"><b>Title:</b> {{ book.title}} </br> <b>Author:</b> {{ book.author }} </br> <b>Year:</b>
+            {{ book.year }} </br> <b>ISBN:</b> {{ book.isbn }}</p>
+        </small></h6>
+      <a href="{{ url_for('book') }}?id={{ book.id }}" class="btn btn-primary">See Book</a>
+    </div>
+  </div>
+  {% endfor %}
 </div>
+{% else %}
+{% if search_data %}
+<div class="alert alert-warning" role="alert">
+  <strong>Ooops!</strong> I found nothing! Try changing things a bit.
+</div>
+{% endif %}
+{% endif %}
 
 {% endif %}
 {% endblock %}
